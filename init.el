@@ -86,19 +86,18 @@
   (package-install 'use-package))
 (require 'use-package)
 
-(use-package magit           :ensure t)
-(use-package which-key       :ensure t :config (which-key-mode))
-(use-package move-text       :ensure t :bind (("M-<up>" . move-text-up) ("M-<down>" . move-text-down)))
-(use-package dashboard       :ensure t :config (dashboard-setup-startup-hook))
-(use-package all-the-icons   :ensure t)
-(use-package nerd-icons      :ensure t)
-(use-package vterm           :ensure t)
-(use-package ivy             :ensure t :config (ivy-mode))
-(use-package helm            :ensure t :config (helm-mode))
+(use-package helm               :ensure t :config (helm-mode))
+(use-package magit              :ensure t)
+(use-package which-key          :ensure t :config (which-key-mode))
+(use-package move-text          :ensure t :bind (("M-<up>" . move-text-up) ("M-<down>" . move-text-down)))
+(use-package dashboard          :ensure t :config (dashboard-setup-startup-hook))
+(use-package all-the-icons      :ensure t)
+(use-package nerd-icons         :ensure t)
+(use-package vterm              :ensure t)
 
-(use-package lsp-mode :ensure t :hook (java-mode . lsp) :commands lsp)
-(use-package lsp-java :ensure t :after lsp-mode :config (setq lsp-java-format-on-type-enabled t) (setq lsp-java-save-actions-organize-imports t))
-(use-package company :ensure t :hook (lsp-mode . company-mode) :config (setq company-minimum-prefix-length 1) (setq company-idle-delay 0.0))
+(use-package lsp-mode           :ensure t :hook ((c-mode c++-mode java-mode web-mode) . lsp-deferred) :commands lsp)
+(use-package lsp-java           :ensure t :after lsp-mode)
+(use-package company            :ensure t :hook (lsp-mode . company-mode))
 
 ;;  ____       _                 _                  
 ;; | __ )  ___| |__   __ ___   _(_) ___  _   _ _ __ 
@@ -125,34 +124,42 @@
 (setq backup-by-copying t)
 (setq auto-save-default t)
 
-(defvar line-length 100)
+;; (defvar line-length 100)
+;; (setq whitespace-line-column line-length)
+;; (setq-default fill-column line-length)
+;; (setq display-fill-column-indicator-character ?\u2502)
+;; (add-hook 'text-mode-hook 'display-fill-column-indicator-mode)
+;; (add-hook 'prog-mode-hook 'display-fill-column-indicator-mode)
 
-(setq whitespace-line-column line-length)
+(setq-default indent-tabs-mode t)
+(setq-default tab-width 4)
+(setq backward-delete-char-untabify-method 'hungry)
 
-(setq-default fill-column line-length)
-(setq display-fill-column-indicator-character ?\u2502)
-(add-hook 'text-mode-hook 'display-fill-column-indicator-mode)
-(add-hook 'prog-mode-hook 'display-fill-column-indicator-mode)
+;; LSP stuff
+
+(setq lsp-auto-guess-root t)
+(setq lsp-log-io nil)
+(setq lsp-restart 'auto-restart)
+(setq lsp-enable-symbol-highlighting nil)
+(setq lsp-enable-on-type-formatting nil)
+(setq lsp-signature-auto-activate nil)
+(setq lsp-signature-render-documentation nil)
+(setq lsp-eldoc-hook nil)
+(setq lsp-modeline-code-actions-enable nil)
+(setq lsp-modeline-diagnostics-enable nil)
+(setq lsp-headerline-breadcrumb-enable nil)
+(setq lsp-semantic-tokens-enable nil)
+(setq lsp-enable-folding nil)
+(setq lsp-enable-imenu nil)
+(setq lsp-enable-snippet nil)
+(setq read-process-output-max (* 1024 1024))
+(setq lsp-idle-delay 0.5)
 
 ;;   ____          _      
 ;;  / ___|___   __| | ___ 
 ;; | |   / _ \ / _` |/ _ \
 ;; | |__| (_) | (_| |  __/
 ;;  \____\___/ \__,_|\___|
-
-;; General
-(setq indent-tabs-mode t)
-(setq tab-width 4)
-
-;; C/C++
-(setq c-basic-offset 4)
-(setq c-indent-level 4)
-
-;; Java
-(setq java-indent-level 2)
-
-;; Python
-(setq python-indent-offset 4)
 
 ;;  __  __                          
 ;; |  \/  | __ _  ___ _ __ ___  ___ 
@@ -172,6 +179,37 @@
       (message "No line to comment out."))))
 
 (global-set-key (kbd "C-;") 'comment-current-line)
+
+;; Change lsp commands from s-l to C-c l
+(global-set-key (kbd "C-c l w d") 'lsp-describe-session)
+(global-set-key (kbd "C-c l h h") 'lsp-describe-thing-at-point)
+(global-set-key (kbd "C-c l w D") 'lsp-disconnect)
+(global-set-key (kbd "C-c l a h") 'lsp-document-highlight)
+(global-set-key (kbd "C-c l a a") 'lsp-execute-code-action)
+(global-set-key (kbd "C-c l g g") 'lsp-find-definition)
+(global-set-key (kbd "C-c l g i") 'lsp-find-implementation)
+(global-set-key (kbd "C-c l g r") 'lsp-find-references)
+(global-set-key (kbd "C-c l g t") 'lsp-find-type-definition)
+(global-set-key (kbd "C-c l = =") 'lsp-format-buffer)
+(global-set-key (kbd "C-c l = r") 'lsp-format-region)
+(global-set-key (kbd "C-c l T b") 'lsp-headerline-breadcrumb-mode)
+(global-set-key (kbd "C-c l T l") 'lsp-lens-mode)
+(global-set-key (kbd "C-c l T a") 'lsp-modeline-code-actions-mode)
+(global-set-key (kbd "C-c l T D") 'lsp-modeline-diagnostics-mode)
+(global-set-key (kbd "C-c l r o") 'lsp-organize-imports)
+(global-set-key (kbd "C-c l r r") 'lsp-rename)
+(global-set-key (kbd "C-c l w r") 'lsp-restart-workspace)
+(global-set-key (kbd "C-c l w q") 'lsp-shutdown-workspace)
+(global-set-key (kbd "C-c l g e") 'lsp-treemacs-errors-list)
+(global-set-key (kbd "C-c l g h") 'lsp-treemacs-call-hierarchy)
+(global-set-key (kbd "C-c l F b") 'lsp-workspace-blocklist-remove)
+(global-set-key (kbd "C-c l F a") 'lsp-workspace-folders-add)
+(global-set-key (kbd "C-c l F r") 'lsp-workspace-folders-remove)
+(global-set-key (kbd "C-c l w r") 'lsp-workspace-restart)
+
+;; (global-set-key (kbd "C-c C-c s") 'mc/edit-beginnings-of-lines)
+;; (global-set-key (kbd "C-c C-c e") 'mc/edit-ends-of-lines)
+;; (global-set-key (kbd "C-c C-c l") 'mc/edit-lines)
 
 ;;  ____        _           _       ____                           
 ;; / ___| _ __ | | __ _ ___| |__   / ___|  ___ _ __ ___  ___ _ __  
@@ -203,7 +241,7 @@
 ;; | |  | | | / __| __/ _ \| '_ ` _ \ 
 ;; | |__| |_| \__ \ || (_) | | | | | |
 ;;  \____\__,_|___/\__\___/|_| |_| |_|
-;; The below text is added automatically by Emacs
+;; The text below is added automatically by Emacs
 ;; Do not edit
 
 (custom-set-variables
