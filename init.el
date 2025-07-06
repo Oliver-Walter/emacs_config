@@ -167,7 +167,7 @@
 ;; | |  | | (_| | (__| | | (_) \__ \
 ;; |_|  |_|\__,_|\___|_|  \___/|___/
 
-(global-set-key (kbd "C-w") 'whitespace-mode)
+(global-set-key (kbd "C-c w") 'whitespace-mode)
 (global-set-key (kbd "M-c") 'compile)
 
 (defun comment-current-line ()
